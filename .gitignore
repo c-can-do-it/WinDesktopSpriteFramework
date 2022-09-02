@@ -26,6 +26,15 @@
 *.a
 *.lib
 
+#VS2017
+*.opendb
+*.VC.db
+*.ipch
+*.tlog
+*.lastbuildstate
+*.ilk
+*.pdb
+
 # Executables
 *.exe
 *.out
