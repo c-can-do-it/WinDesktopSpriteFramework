@@ -34,6 +34,8 @@
 *.lastbuildstate
 *.ilk
 *.pdb
+*.log
+*.idb
 
 # Executables
 *.exe
