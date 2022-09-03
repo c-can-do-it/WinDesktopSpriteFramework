@@ -21,7 +21,7 @@ private:
 	int m_mouseX;
 	int m_mouseY;
 public:
-	SpriteRenderWindow(HINSTANCE hInstance = NULL,unsigned int width=300,unsigned int height=300, COLORREF keycolor=RGB(0,0,1));
+	SpriteRenderWindow(HINSTANCE hInstance = NULL,unsigned int width=300,unsigned int height=300, COLORREF keycolor=RGB(0,0,0));
 	~SpriteRenderWindow();
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -38,6 +38,8 @@ protected:
 	//void OnRButtonUp(HWND hWnd, int x, int y, UINT flags);
 	//void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify);
 	void OnPaint(HWND hWnd);
+	void UpdateFrame(HDC hdc);
+	
 
 };
 

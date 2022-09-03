@@ -1,5 +1,10 @@
 #include "SpriteRenderWindow.h"
 #include <windowsx.h>
+#include "SpriteUtils.h"
+#include <thread>
+
+
+
 namespace SpriteFrameWork
 {
 	// 全局变量:
@@ -179,11 +184,57 @@ namespace SpriteFrameWork
 			MoveWindow(hwnd, cx, cy, winRect.right - winRect.left, winRect.bottom - winRect.top, TRUE);	
 		}
 	}
+
+	HBITMAP gCurrentBitMap = NULL;
+	std::thread* t1 = NULL;
+	bool bQuit = false;
+
 	BOOL SpriteRenderWindow::OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	{
 		SetWindowLong(hWnd, GWL_EXSTYLE, WS_EX_LAYERED /*| WS_EX_TOOLWINDOW*/ | WS_EX_TOPMOST);
 		SetLayeredWindowAttributes(hWnd, m_TransparantKeyColor, 255, LWA_COLORKEY);   // LWA_ALPHA | LWA_COLORKEY
 		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+	
+
+		std::thread* t1 = new std::thread([&]() {
+		
+		
+	   const char* files[] = {"25.bmp","26.bmp","27.bmp","28.bmp"};
+
+        int i = 0;
+
+			while (!bQuit)
+			{
+
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+
+				int index = i % 4;
+
+				std::string testfile = SpriteFrameWork::Utils::GetRootDir() + "\\actors\\son\\act1\\" + files[index];
+
+				gCurrentBitMap = (HBITMAP)LoadImageA(g_hInst, testfile.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+
+				::InvalidateRect(m_hWnd, NULL, TRUE);
+				//::InvalidateWindow(hwnd, NULL, TRUE);
+				UpdateWindow(m_hWnd);
+
+
+
+
+				i++;
+		    
+			
+			}
+		
+		
+		
+		});
+
+
+
+
 
 		return TRUE;
 	}
@@ -198,13 +249,51 @@ namespace SpriteFrameWork
 		GetClientRect(hWnd, &rc);
 		HBRUSH brush = CreateSolidBrush(m_TransparantKeyColor);
 		FillRect(hdc, &rc, brush);
+
 		DeleteObject(brush);
+
+
+		UpdateFrame(hdc);
+
+
+		
+
 
 
 		EndPaint(hWnd, &ps);
 
 
 	}
+
+
+
+	void SpriteRenderWindow::UpdateFrame(HDC hdc)
+	{
+
+		//std::string testfile =SpriteFrameWork::Utils::GetRootDir() + "\\actors\\son\\act1\\25.bmp";
+
+		//gCurrentBitMap = (HBITMAP)LoadImageA(g_hInst, testfile.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+		if (gCurrentBitMap == NULL) return;
+
+		BITMAP bm = { 0 };
+		GetObject(gCurrentBitMap, sizeof(bm), &bm);
+
+		HDC hMemdc = CreateCompatibleDC(hdc);
+		//SelectBitmap(hMemdc, hBitmap);
+
+		HBITMAP hBitmapOld = (HBITMAP)SelectObject(hMemdc, gCurrentBitMap);
+		BitBlt(hdc, 0, 0, bm.bmWidth, bm.bmHeight, hMemdc, 0, 0, SRCCOPY);
+		SelectObject(hMemdc, hBitmapOld);
+
+		DeleteObject(gCurrentBitMap);
+
+		gCurrentBitMap = NULL;
+
+		DeleteDC(hMemdc);
+
+	}
+
 
 
 
